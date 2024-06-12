@@ -7,8 +7,8 @@
 ## with the $LAD_SHELL_PREFIX variable pointing
 ## to the $PREFIX/local directory
 
-CONTAINER="jug_xl"
-VERSION="nightly"
+CONTAINER="ladlib"
+VERSION="main"
 PREFIX="$PWD"
 
 function print_the_help {
