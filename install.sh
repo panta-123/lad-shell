@@ -125,7 +125,6 @@ function install_singularity() {
     mv ${INSIF} $SIF
     chmod +x ${SIF}
     unset INSIF
-    fi
   ## we are in sane territory, yay!
   else
     ## check if we can just use cvmfs for the image
