@@ -284,7 +284,7 @@ fi
 
 export LAD_SHELL_PREFIX=$PREFIX/local
 export SINGULARITY_BINDPATH=$BINDPATH
-\${SINGULARITY:-$SINGULARITY} exec \${SINGULARITY_OPTIONS:-} \${SIF:-$SIF} lad-shell \$@
+\${SINGULARITY:-$SINGULARITY} exec \${SINGULARITY_OPTIONS:-} \${SIF:-$SIF} /bin/bash \$@
 EOF
 
   chmod +x lad-shell
