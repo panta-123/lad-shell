@@ -134,13 +134,14 @@ function install_singularity() {
       ## need to cleanup in this case, else it will try to make a subdirectory
       rm -rf ${SIF}
       ln -sf /cvmfs/singularity.opensciencegrid.org/${CONTAINER}:${VERSION} ${SIF}
-    ## check if we have an jlab deployed image.
+    ## check if we have an jlab deployed image. #TODO replace with work lad directory
     elif [ -f /u/home/panta/ladimg/${CONTAINER}-${VERSION}.sif ]; then
       ln -sf /u/home/panta/ladimg/${CONTAINER}-${VERSION}.sif ${SIF}
     ## if not, download the container to the system
     else
       ## get the python installer and run the old-style install
       ## work in temp directory
+      echo "I am downloading"
       tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
       pushd $tmp_dir
       wget https://github.com/panta-123/lad-shell/install.py
