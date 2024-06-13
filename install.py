@@ -7,7 +7,7 @@ import urllib.request
 DEFAULT_IMG='ladlib'
 DEFAULT_VERSION='main'
 
-SHORTCUTS = ['eic-shell']
+SHORTCUTS = ['lad-shell']
 DOCKER_REF = r'docker://apanta123/$CONTAINER:$VERSION'
 
 ## Singularity bind directive

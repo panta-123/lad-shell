@@ -146,7 +146,7 @@ function install_singularity() {
       pushd $tmp_dir
       wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
       chmod +x install.py
-      ./install.py -f -c $CONTAINER -v $VERSION .
+      python3 install.py -f -c $CONTAINER -v $VERSION
       INSIF=lib/`basename ${SIF}`
       mv $INSIF $SIF
       chmod +x ${SIF}
