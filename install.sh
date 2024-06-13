@@ -144,7 +144,7 @@ function install_singularity() {
       echo "I am downloading"
       tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
       pushd $tmp_dir
-      wget https://github.com/panta-123/lad-shell/install.py
+      wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
       chmod +x install.py
       ./install.py -f -c $CONTAINER -v $VERSION .
       INSIF=lib/`basename ${SIF}`
