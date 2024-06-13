@@ -142,8 +142,8 @@ function install_singularity() {
       ## get the python installer and run the old-style install
       ## work in temp directory
       echo "I am downloading"
-      tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-      pushd $tmp_dir
+      #tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+      #pushd $tmp_dir
       wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
       chmod +x install.py
       python3 install.py -f -c ${CONTAINER} -v ${VERSION} local
@@ -151,8 +151,8 @@ function install_singularity() {
       mv $INSIF $SIF
       chmod +x ${SIF}
       ## cleanup
-      popd
-      rm -rf $tmp_dir
+      #popd
+      #rm -rf $tmp_dir
       unset INSIF
     fi
   fi
