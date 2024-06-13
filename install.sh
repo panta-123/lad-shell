@@ -127,14 +127,14 @@ function install_singularity() {
     unset INSIF
   ## we are in sane territory, yay!
   else
-    ## check if we can just use cvmfs for the image
+    ## check if we can just use local image in PREFIX/local/lib
     SIF="$PREFIX/local/lib/${CONTAINER}-${VERSION}.sif"
     if [ -z "$DISABLE_CVMFS_USAGE" -a -d /cvmfs/singularity.opensciencegrid.org/eicweb/${CONTAINER}:${VERSION} ]; then
       SIF="$PREFIX/local/lib/${CONTAINER}-${VERSION}"
       ## need to cleanup in this case, else it will try to make a subdirectory
       rm -rf ${SIF}
-      ln -sf /cvmfs/singularity.opensciencegrid.org/eicweb/${CONTAINER}:${VERSION} ${SIF}
-    ## check if we have an internal CI image we will use for testing purposes
+      ln -sf /cvmfs/singularity.opensciencegrid.org/${CONTAINER}:${VERSION} ${SIF}
+    ## check if we have an jlab deployed image.
     elif [ -f /u/home/panta/ladimg/${CONTAINER}-${VERSION}.sif ]; then
       ln -sf /u/home/panta/ladimg/${CONTAINER}-${VERSION}.sif ${SIF}
     ## if not, download the container to the system
@@ -278,7 +278,7 @@ if [ ! -z \${UPGRADE} ]; then
   fi
   curl -L https://github.com/panta-123/lad-shell/raw/main/install.sh \
     | bash -s -- \${FLAGS}
-  echo "eic-shell upgrade sucessful"
+  echo "lad-shell upgrade sucessful"
   exit 0
 fi
 
