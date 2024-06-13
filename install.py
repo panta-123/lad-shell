@@ -8,7 +8,7 @@ DEFAULT_IMG='ladlib'
 DEFAULT_VERSION='main'
 
 SHORTCUTS = ['lad-shell']
-DOCKER_REF = r'docker://apanta123/$CONTAINER:$VERSION'
+DOCKER_REF = r'docker://apanta123/{img}:{tag}'
 
 ## Singularity bind directive
 BIND_DIRECTIVE= '-B {0}:{0}'
