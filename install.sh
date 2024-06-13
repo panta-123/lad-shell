@@ -142,7 +142,7 @@ function install_singularity() {
       ## get the python installer and run the old-style install
       ## work in temp directory
       echo "I am downloading"
-      tmp_dir="/work/hallc/nps/panta"
+      tmp_dir="/work/hallc/nps/panta/ladlibimg"
       pushd $tmp_dir
       wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
       chmod +x install.py
