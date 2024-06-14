@@ -141,7 +141,8 @@ function install_singularity() {
     else
       ## get the python installer and run the old-style install
       ## work in temp directory
-      echo "I am downloading"
+      echo "Downloading image"
+      export TMPDIR=/tmp
       tmp_dir="mktemp -d -t img-XXXXXXXXXX"
       pushd $tmp_dir
       wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
