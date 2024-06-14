@@ -163,6 +163,7 @@ if __name__ == "__main__":
         err = os.system(cmd)
         if err:
             raise ContainerDownloadError()
+    if os.path.exists(container):
         cmd = ['mv ', container, root_prefix]
         cmd = ' '.join(cmd)
         print('Executing:', cmd)
