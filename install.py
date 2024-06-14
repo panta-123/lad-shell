@@ -164,6 +164,12 @@ if __name__ == "__main__":
         if err:
             raise ContainerDownloadError()
         cmd = ['mv ', container, root_prefix]
+        cmd = ' '.join(cmd)
+        print('Executing:', cmd)
+        err = os.system(cmd)
+        if err:
+            raise ContainerDownloadError()
+
     else:
         print('WARNING: Container found at', container)
         print(' ---> run with -f to force a re-download')
