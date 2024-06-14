@@ -3,7 +3,7 @@ import argparse
 import re
 import urllib.request
 
-## Gitlab group and project/program name. 
+## Gitlab group and project/program name.
 DEFAULT_IMG='ladlib'
 DEFAULT_VERSION='main'
 
@@ -161,7 +161,6 @@ if __name__ == "__main__":
     img = args.container
     version_docker = args.version
     tmp_dir = args.tmp_dir
-    import os
     os.environ["APPTAINER_CACHEDIR"] = tmp_dir
     container = '{}/{}-{}.sif'.format(tmp_dir, img, version_docker)
     if not os.path.exists(container) or args.force:

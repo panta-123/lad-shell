@@ -142,7 +142,7 @@ function install_singularity() {
       ## get the python installer and run the old-style install
       ## work in temp directory
       echo "Downloading image"
-      wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
+      wget https://raw.githubusercontent.com/JeffersonLab/lad-shell/main/install.py
       chmod +x install.py
       python3 install.py -f -c ${CONTAINER} -v ${VERSION} $PREFIX/local
       chmod +x ${SIF}
