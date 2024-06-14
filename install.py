@@ -164,7 +164,7 @@ if __name__ == "__main__":
         if err:
             raise ContainerDownloadError()
     if os.path.exists(container):
-        cmd = ['mv ', container, os.path.abspath('{}/local/lib'.format(root_prefix))]
+        cmd = ['mv ', container, '{}/local/lib'.format(root_prefix)]
         cmd = ' '.join(cmd)
         print('Executing:', cmd)
         err = os.system(cmd)
