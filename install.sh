@@ -321,7 +321,7 @@ function install_docker() {
     echo " - Additional platform flag to run on arm64"
   fi
 
-  ## create a new top-level eic-shell launcher script
+  ## create a new top-level lad-shell launcher script
   ## that sets the LAD_SHELL_PREFIX and then starts singularity
 cat << EOF > lad-shell
 #!/bin/bash
@@ -380,28 +380,28 @@ while [ \$# -gt 0 ]; do
 done
 
 if [ ! -z \${UPGRADE} ]; then
-  echo "Upgrading eic-shell..."
+  echo "Upgrading lad-shell..."
   docker pull $IMG || exit 1
-  echo "eic-shell upgrade sucessful"
+  echo "lad-shell upgrade sucessful"
   exit 0
 fi
 EOF
 
   if [ `uname -s` = 'Darwin' ]; then
-      echo 'if [ ! ${NOX} ]; then' >> eic-shell
-      echo ' nolisten=`defaults find nolisten_tcp | grep nolisten | head -n 1 | awk ' "'{print" '$3}'"'" '|cut -b 1 `' >> eic-shell
-      echo ' [[ $nolisten -ne 0 ]] && echo "For X support: In XQuartz settings --> Security --> enable \"Allow connections from network clients\" and restart (should be only once)."' >> eic-shell
+      echo 'if [ ! ${NOX} ]; then' >> lad-shell
+      echo ' nolisten=`defaults find nolisten_tcp | grep nolisten | head -n 1 | awk ' "'{print" '$3}'"'" '|cut -b 1 `' >> lad-shell
+      echo ' [[ $nolisten -ne 0 ]] && echo "For X support: In XQuartz settings --> Security --> enable \"Allow connections from network clients\" and restart (should be only once)."' >> lad-shell
       ## getting the following single and double quotes, escapes and backticks right was a nightmare
       ## But with a heredoc it was worse
-      echo '  xhost +localhost' >> eic-shell
-      echo '  dispnum=`ps -e |grep Xquartz | grep listen | grep -v xinit |awk ' "'{print" '$5}'"'" '`' >> eic-shell
-      echo '  XSTUFF="-e DISPLAY=host.docker.internal${dispnum} -v /tmp/.X11-unix:/tmp/.X11-unix"' >> eic-shell
-      echo 'fi' >> eic-shell
+      echo '  xhost +localhost' >> lad-shell
+      echo '  dispnum=`ps -e |grep Xquartz | grep listen | grep -v xinit |awk ' "'{print" '$5}'"'" '`' >> lad-shell
+      echo '  XSTUFF="-e DISPLAY=host.docker.internal${dispnum} -v /tmp/.X11-unix:/tmp/.X11-unix"' >> lad-shell
+      echo 'fi' >> lad-shell
   fi
   echo "docker run $PLATFORM_FLAG $MOUNT \$XSTUFF -w=$PWD -it --rm -e LAD_SHELL_PREFIX=$PREFIX/local $IMG lad-shell \$@" >> lad-shell
 
-  chmod +x eic-shell
-  echo " - Created custom eic-shell excecutable"
+  chmod +x lad-shell
+  echo " - Created custom lad-shell excecutable"
 }
 
 ## detect OS

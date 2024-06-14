@@ -110,7 +110,7 @@ if __name__ == "__main__":
             dest='container',
             default=DEFAULT_IMG,
             help='(opt.) Container to install. '
-                 'D: {} (also available: jug_dev, and legacy "eic" container).')
+                 'D: {} (also available: jug_dev, and legacy "lad" container).')
     parser.add_argument(
             '-v', '--version',
             dest='version',
@@ -128,6 +128,11 @@ if __name__ == "__main__":
             dest='bind_paths',
             action='append',
             help='(opt.) extra bind paths for singularity.')
+    parser.add_argument(
+            '-t', '--tmpdir',
+            dest='tmpdir',
+            default='/tmp',
+            help='(opt.) Temporary directory to use. D: /tmp')
 
     args = parser.parse_args()
 
@@ -152,9 +157,13 @@ if __name__ == "__main__":
     for dir in dirs:
         print(' -', dir)
         smart_mkdir(dir)
+    # set apptainer cache directory to tmp so that we don't fill up home directory
     img = args.container
     version_docker = args.version
-    container = '{}/{}-{}.sif'.format("/tmp", img, version_docker)
+    tmp_dir = args.tmp_dir
+    import os
+    os.environ["APPTAINER_CACHEDIR"] = tmp_dir
+    container = '{}/{}-{}.sif'.format(tmp_dir, img, version_docker)
     if not os.path.exists(container) or args.force:
         print('Attempting alternative download from docker registry')
         cmd = ['singularity pull', '--force', container, DOCKER_REF.format(img=img, tag=version_docker)]
@@ -174,6 +183,8 @@ if __name__ == "__main__":
     else:
         print('WARNING: Container found at', container)
         print(' ---> run with -f to force a re-download')
+
+    os.environ.pop('APPTAINER_CACHEDIR', None)
 
 
     print('Container deployment successful!')
