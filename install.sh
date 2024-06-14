@@ -142,19 +142,10 @@ function install_singularity() {
       ## get the python installer and run the old-style install
       ## work in temp directory
       echo "Downloading image"
-      export TMPDIR=/tmp
-      tmp_dir="mktemp -d -t img-XXXXXXXXXX"
-      pushd $tmp_dir
       wget https://raw.githubusercontent.com/panta-123/lad-shell/main/install.py
       chmod +x install.py
-      python3 install.py -f -c ${CONTAINER} -v ${VERSION} .
-      INSIF=lib/`basename ${SIF}`
-      mv $INSIF $SIF
+      python3 install.py -f -c ${CONTAINER} -v ${VERSION} $PREFIX/local
       chmod +x ${SIF}
-      ## cleanup
-      popd
-      rm -rf $tmp_dir
-      unset INSIF
     fi
   fi
 
@@ -286,7 +277,7 @@ fi
 
 export LAD_SHELL_PREFIX=$PREFIX/local
 export SINGULARITY_BINDPATH=$BINDPATH
-\${SINGULARITY:-$SINGULARITY} exec \${SINGULARITY_OPTIONS:-} \${SIF:-$SIF} /bin/bash \$@
+\${SINGULARITY:-$SINGULARITY} exec \${SINGULARITY_OPTIONS:-} \${SIF:-$SIF} lad-shell \$@
 EOF
 
   chmod +x lad-shell
@@ -407,7 +398,7 @@ EOF
       echo '  XSTUFF="-e DISPLAY=host.docker.internal${dispnum} -v /tmp/.X11-unix:/tmp/.X11-unix"' >> eic-shell
       echo 'fi' >> eic-shell
   fi
-  echo "docker run $PLATFORM_FLAG $MOUNT \$XSTUFF -w=$PWD -it --rm -e LAD_SHELL_PREFIX=$PREFIX/local $IMG eic-shell \$@" >> eic-shell
+  echo "docker run $PLATFORM_FLAG $MOUNT \$XSTUFF -w=$PWD -it --rm -e LAD_SHELL_PREFIX=$PREFIX/local $IMG lad-shell \$@" >> lad-shell
 
   chmod +x eic-shell
   echo " - Created custom eic-shell excecutable"

@@ -84,40 +84,6 @@ def make_launcher(app, container, bindir,
     ## write our scripts
     _write_script(launcher_path, launcher)
 
-## Generic module file
-_MODULEFILE='''#%Module1.0#####################################################################
-##
-## for {name} {version}
-##
-proc ModulesHelp {{ }} {{
-    puts stderr "This module sets up the environment for the {name} container"
-}}
-module-whatis "{name} {version}"
-
-# For Tcl script use only
-set version 4.1.4
-
-prepend-path    PATH    {bindir}
-'''
-
-
-def make_modulefile(project, version, moduledir, bindir):
-    '''Configure and install a modulefile for this project.
-
-    Arguments:
-        - project: project name
-        - version: project version
-        - moduledir: root modulefile directory
-        - bindir: where executables for this project are located
-    '''
-
-    ## create our modulefile
-    content = _MODULEFILE.format(name=project, version=version, bindir=bindir)
-    fname = '{}/{}'.format(moduledir, version)
-    print(' - creating', fname)
-    with open(fname, 'w') as file:
-        file.write(content)
-
 def smart_mkdir(dir):
     '''functions as mkdir -p, with a write-check.
     
@@ -162,11 +128,6 @@ if __name__ == "__main__":
             dest='bind_paths',
             action='append',
             help='(opt.) extra bind paths for singularity.')
-    parser.add_argument(
-            '-m', '--module-path',
-            dest='module_path',
-            help='(opt.) Root module path to install a modulefile. '
-                 'D: Do not install a modulefile')
 
     args = parser.parse_args()
 
@@ -183,26 +144,17 @@ if __name__ == "__main__":
                 raise InvalidArgumentError()
         bind_directive = ' '.join([BIND_DIRECTIVE.format(path) for path in args.bind_paths])
     args.prefix = os.path.abspath(args.prefix)
-    if not args.module_path:
-        deploy_local=True
-    else:
-        deploy_local=False
+
     print('Install prefix:', args.prefix)
     print('Creating install prefix if needed...')
-    bindir = '{}/bin'.format(args.prefix)
-    libdir = '{}/lib'.format(args.prefix)
-    libexecdir = '{}/libexec'.format(args.prefix)
     root_prefix = os.path.abspath('{}/..'.format(args.prefix))
-    dirs = [bindir, libdir, libexecdir]
-    if not deploy_local:
-        moduledir = '{}/{}'.format(args.module_path, args.container)
-        dirs.append(moduledir)
+    dirs = [root_prefix]
     for dir in dirs:
         print(' -', dir)
         smart_mkdir(dir)
     img = args.container
     version_docker = args.version
-    container = '{}/{}-{}.sif'.format(libdir, img, version_docker)
+    container = '{}/{}-{}.sif'.format(root_prefix, img, version_docker)
     if not os.path.exists(container) or args.force:
         print('Attempting alternative download from docker registry')
         cmd = ['singularity pull', '--force', container, DOCKER_REF.format(img=img, tag=version_docker)]
@@ -214,20 +166,6 @@ if __name__ == "__main__":
     else:
         print('WARNING: Container found at', container)
         print(' ---> run with -f to force a re-download')
+
     
-    if not deploy_local:
-        make_modulefile(args.container, version_docker, moduledir, bindir)
-
-    ## configure the application launchers
-    print('Configuring applications launchers: ')
-    for prog in SHORTCUTS:
-        app = prog
-        exe = prog
-        if type(prog) == tuple:
-            app = prog[0]
-            exe = prog[1]
-        make_launcher(app, container, bindir,
-                      bind=bind_directive,
-                      exe=exe)
-
     print('Container deployment successful!')
