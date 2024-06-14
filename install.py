@@ -154,7 +154,7 @@ if __name__ == "__main__":
         smart_mkdir(dir)
     img = args.container
     version_docker = args.version
-    container = '{}/{}-{}.sif'.format(root_prefix, img, version_docker)
+    container = '{}/{}-{}.sif'.format("/tmp", img, version_docker)
     if not os.path.exists(container) or args.force:
         print('Attempting alternative download from docker registry')
         cmd = ['singularity pull', '--force', container, DOCKER_REF.format(img=img, tag=version_docker)]
@@ -163,9 +163,10 @@ if __name__ == "__main__":
         err = os.system(cmd)
         if err:
             raise ContainerDownloadError()
+        cmd = ['mv ', container, root_prefix]
     else:
         print('WARNING: Container found at', container)
         print(' ---> run with -f to force a re-download')
 
-    
+
     print('Container deployment successful!')
