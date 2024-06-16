@@ -4,7 +4,7 @@ LAD software environment container utilities
 Local Installation
 ------------------
 
-*The environment has been tested on linux (requires singularity v3+ or apptainer v1+)
+*The environment has been tested on linux (requires singularity v3+ or apptainer v1+) or podman
 and MacOS (requires docker)*
 
 Please follow the steps below to setup and run the container in your environment.
