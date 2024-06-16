@@ -404,6 +404,125 @@ EOF
   echo " - Created custom lad-shell excecutable"
 }
 
+function install_podman() {
+  ## check for docker install
+  PODMAN=$(which podman)
+  if [ -z ${DOCKER} ]; then
+    echo "ERROR: no docker install found, docker is required for the docker-based install"
+  fi
+  echo " - Found docker at ${PODMAN}"
+
+  IMG=apanta123/${CONTAINER}:${VERSION}
+  docker pull ${IMG}
+  echo " - Deployed ${CONTAINER} image: ${IMG}"
+
+  ## We want to make sure the root directory of the install directory
+  ## is always bound. We also check for the existence of a few standard
+  ## locations (/Volumes /Users /tmp) and bind those too if found
+  echo " - Determining mount paths"
+  PREFIX_ROOT="/$(realpath $PREFIX | cut -d "/" -f2)"
+  MOUNT=""
+  echo "   --> $PREFIX_ROOT"
+  for dir in /Volumes /Users /tmp; do
+    ## only add directories once
+    if [[ ${MOUNT} =~ $(basename $dir) ]]; then
+      continue
+    fi
+    if [ -d $dir ]; then
+      echo "   --> $dir"
+      MOUNT="$MOUNT -v $dir:$dir"
+    fi
+  done
+  echo " - Docker mount directive: '$MOUNT'"
+  PLATFORM_FLAG=''
+  if [ `uname -m` = 'arm64' ]; then
+    PLATFORM_FLAG='--platform linux/amd64'
+    echo " - Additional platform flag to run on arm64"
+  fi
+
+  ## create a new top-level lad-shell launcher script
+  ## that sets the LAD_SHELL_PREFIX and then starts singularity
+cat << EOF > lad-shell
+#!/bin/bash
+
+## capture environment setup for upgrades
+CONTAINER=$CONTAINER
+TMPDIR=$TMPDIR
+VERSION=$VERSION
+PREFIX=$PREFIX
+DISABLE_CVMFS_USAGE=${DISABLE_CVMFS_USAGE}
+
+function print_the_help {
+  echo "USAGE:  ./lad-shell [OPTIONS] [ -- COMMAND ]"
+  echo "OPTIONAL ARGUMENTS:"
+  echo "          -u,--upgrade    Upgrade the container to the latest version"
+  echo "          --noX           Disable X11 forwarding on macOS"
+  echo "          -h,--help       Print this message"
+  echo ""
+  echo "  Start the lad-shell containerized software environment (Docker version)."
+  echo ""
+  echo "EXAMPLES: "
+  echo "  - Start an interactive shell: ./lad-shell" 
+  echo "  - Upgrade the container:      ./lad-shell --upgrade"
+  echo "  - Execute a single command:   ./lad-shell -- <COMMAND>"
+  echo ""
+  exit
+}
+
+UPGRADE=
+NOX=
+while [ \$# -gt 0 ]; do
+  key=\$1
+  case \$key in
+    -u|--upgrade)
+      UPGRADE=1
+      shift
+      ;;
+    --noX)
+      NOX=1
+      shift
+      ;;
+     -h|--help)
+      print_the_help
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      echo "ERROR: unknown argument: \$key"
+      echo "use --help for more info"
+      exit 1
+      ;;
+  esac
+done
+
+if [ ! -z \${UPGRADE} ]; then
+  echo "Upgrading lad-shell..."
+  podman pull $IMG || exit 1
+  echo "lad-shell upgrade sucessful"
+  exit 0
+fi
+EOF
+
+  if [ `uname -s` = 'Darwin' ]; then
+      echo 'if [ ! ${NOX} ]; then' >> lad-shell
+      echo ' nolisten=`defaults find nolisten_tcp | grep nolisten | head -n 1 | awk ' "'{print" '$3}'"'" '|cut -b 1 `' >> lad-shell
+      echo ' [[ $nolisten -ne 0 ]] && echo "For X support: In XQuartz settings --> Security --> enable \"Allow connections from network clients\" and restart (should be only once)."' >> lad-shell
+      ## getting the following single and double quotes, escapes and backticks right was a nightmare
+      ## But with a heredoc it was worse
+      echo '  xhost +localhost' >> lad-shell
+      echo '  dispnum=`ps -e |grep Xquartz | grep listen | grep -v xinit |awk ' "'{print" '$5}'"'" '`' >> lad-shell
+      echo '  XSTUFF="-e DISPLAY=host.containers.internal${dispnum} -v /tmp/.X11-unix:/tmp/.X11-unix"' >> lad-shell
+      echo 'fi' >> lad-shell
+  fi
+  echo "podman run $PLATFORM_FLAG $MOUNT \$XSTUFF -w=$PWD -it --rm -e LAD_SHELL_PREFIX=$PREFIX/local $IMG lad-shell \$@" >> lad-shell
+
+  chmod +x lad-shell
+  echo " - Created custom lad-shell excecutable"
+}
+
 ## detect OS
 OS=`uname -s`
 CPU=`uname -m`
